@@ -96,3 +96,92 @@ def convert_action_to_recommendation(action):
         recommendation = "Keep up the good driving and monitor track conditions!"
 
     return recommendation
+
+def generate_recommendations(gaze_proportions, correlation_coefficients):
+    # Analyze gaze distribution and performance correlations to formulate recommendations
+    recommendations = []
+    
+    # Apex
+    apex_gaze_proportion = gaze_proportions['apex']
+    apex_corr_coeff = correlation_coefficients['apex']
+    
+    if apex_gaze_proportion < 0.3:
+        recommendations.append("Increase focus on the apex of corners to improve braking and cornering efficiency.")
+    
+    elif 0.3 <= apex_gaze_proportion < 0.4:
+        recommendations.append("Maintain consistent focus on the apex to optimize cornering performance.")
+        
+    elif 0.4 <= apex_gaze_proportion < 0.5:
+        recommendations.append("Effective gaze allocation at the apex contributes to reduced lap times.")
+    
+    elif apex_gaze_proportion >= 0.5:
+        recommendations.append("Excellent focus on the apex demonstrates a proactive approach to cornering.")
+    
+    # Braking Zone
+    braking_zone_gaze_proportion = gaze_proportions['braking_zone']
+    braking_zone_corr_coeff = correlation_coefficients['braking_zone']
+    
+    if braking_zone_gaze_proportion < 0.3:
+        recommendations.append("Allocate more attention to the braking zone to optimize braking timing and distance.")
+    
+    elif 0.3 <= braking_zone_gaze_proportion < 0.4:
+        recommendations.append("Maintain focus in the braking zone to ensure effective braking modulation.")
+        
+    elif 0.4 <= braking_zone_gaze_proportion < 0.5:
+        recommendations.append("Effective gaze allocation in the braking zone contributes to consistent lap times.")
+    
+    elif braking_zone_gaze_proportion >= 0.5:
+        recommendations.append("Excellent focus in the braking zone demonstrates a precise and controlled approach to braking.")
+    
+    # Side Mirrors
+    side_mirrors_gaze_proportion = gaze_proportions['side_mirrors']
+    side_mirrors_corr_coeff = correlation_coefficients['side_mirrors']
+    
+    if side_mirrors_gaze_proportion < 0.2:
+        recommendations.append("Regularly check side mirrors to maintain situational awareness and avoid collisions.")
+    
+    elif 0.2 <= side_mirrors_gaze_proportion < 0.3:
+        recommendations.append("Consistent side mirror checks demonstrate a proactive approach to situational awareness.")
+        
+    elif 0.3 <= side_mirrors_gaze_proportion < 0.4:
+        recommendations.append("Effective use of side mirrors contributes to maintaining racing lines and avoiding off-track excursions.")
+    
+    elif side_mirrors_gaze_proportion >= 0.4:
+        recommendations.append("Excellent side mirror usage indicates a high level of situational awareness and racecraft.")
+    
+    return recommendations
+
+def generate_additional_recommendations(telemetry_data, gaze_data):
+    # Calculate gaze dwell time in front of other cars
+    front_car_dwell_time = 0
+    for gaze_entry in gaze_data:
+        if gaze_entry['x_gaze'] > 0.8 and gaze_entry['y_gaze'] < 0.5:
+            front_car_dwell_time += gaze_entry['gaze_duration']
+
+    # Calculate time spent at brake markers
+    brake_marker_dwell_time = 0
+    for telemetry_entry in telemetry_data:
+        if telemetry_entry['speed'] < 50:  # Assuming a threshold for entering braking zones
+            brake_marker_dwell_time += 1
+
+    # Calculate time spent looking through corners
+    corner_dwell_time = 0
+    for gaze_entry in gaze_data:
+        if gaze_entry['x_gaze'] < 0.2 and gaze_entry['y_gaze'] < 0.5:
+            corner_dwell_time += gaze_entry['gaze_duration']
+
+    additional_recommendations = []
+
+    # Recommendation for being conscious of other cars
+    if front_car_dwell_time < 5:
+        additional_recommendations.append("Actively monitor the car ahead to anticipate their actions and adjust your driving accordingly.")
+
+    # Recommendation for being at brake markers
+    if brake_marker_dwell_time < 2:
+        additional_recommendations.append("Spend more time at brake markers to ensure precise braking points and reduce lap times.")
+
+    # Recommendation for being around corners
+    if corner_dwell_time < 3:
+        additional_recommendations.append("Maintain focus through corners to anticipate upcoming braking zones and optimize racing lines.")
+
+    return additional_recommendations
